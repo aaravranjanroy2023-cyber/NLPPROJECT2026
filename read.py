@@ -15,9 +15,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import LinearSVC
 
 
-# ---------------------------------------------------
-# 1️⃣ DATASET STANDARDIZATION FUNCTION
-# ---------------------------------------------------
+
 
 def load_dataset(file_path, text_col, score_col, time_col):
 
@@ -32,9 +30,7 @@ def load_dataset(file_path, text_col, score_col, time_col):
     return df
 
 
-# ---------------------------------------------------
-# 2️⃣ LOAD DATASET
-# ---------------------------------------------------
+
 
 print("Loading dataset...")
 
@@ -46,15 +42,7 @@ df = load_dataset(
 )
 
 
-# df = load_dataset("twitter.csv", "text", "likes", "created_at")
 
-
-# df = load_dataset("youtube.csv", "comment", "likes", "published_at")
-
-
-# ---------------------------------------------------
-# 3️⃣ CLEAN DATA
-# ---------------------------------------------------
 
 df = df.dropna(subset=['body'])
 
@@ -67,9 +55,6 @@ df['created_utc'] = pd.to_datetime(df['created_utc'], errors='coerce')
 df = df.dropna(subset=['created_utc'])
 
 
-# ---------------------------------------------------
-# 4️⃣ FEATURE ENGINEERING
-# ---------------------------------------------------
 
 df['hour'] = df['created_utc'].dt.hour
 df['dayofweek'] = df['created_utc'].dt.dayofweek
@@ -105,19 +90,14 @@ df['avg_word_len'] = df['body'].apply(
 )
 
 
-# ---------------------------------------------------
-# 5️⃣ ENGAGEMENT LABEL (DATASET-INDEPENDENT)
-# ---------------------------------------------------
 
-# Instead of fixed score <=1 (which fails for Twitter/YouTube)
+
 threshold = df["score"].median()
 
 df["low_engagement"] = (df["score"] <= threshold).astype(int)
 
 
-# ---------------------------------------------------
-# 6️⃣ DEFINE FEATURES
-# ---------------------------------------------------
+
 
 numeric_features = [
     'sentiment',
@@ -141,9 +121,7 @@ X = df[numeric_features + [text_feature]]
 y = df["low_engagement"]
 
 
-# ---------------------------------------------------
-# 7️⃣ PREPROCESSING PIPELINE
-# ---------------------------------------------------
+
 
 numeric_transformer = Pipeline(steps=[
     ("imputer", SimpleImputer(strategy="mean")),
@@ -165,9 +143,6 @@ preprocessor = ColumnTransformer(
 )
 
 
-# ---------------------------------------------------
-# 8️⃣ TRAIN TEST SPLIT
-# ---------------------------------------------------
 
 X_train, X_test, y_train, y_test = train_test_split(
     X,
@@ -178,9 +153,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 
-# ---------------------------------------------------
-# 9️⃣ MODEL DEFINITIONS
-# ---------------------------------------------------
+
 
 models = {
 
@@ -202,9 +175,7 @@ models = {
 }
 
 
-# ---------------------------------------------------
-# 🔟 TRAIN + EVALUATE
-# ---------------------------------------------------
+
 
 for name, clf in models.items():
 
@@ -224,4 +195,5 @@ for name, clf in models.items():
     pred = pipeline.predict(X_test)
 
     print(classification_report(y_test, pred))
+
     print(df.columns)
